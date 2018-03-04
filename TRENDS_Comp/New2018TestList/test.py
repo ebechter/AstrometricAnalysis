@@ -28,7 +28,7 @@ import matplotlib.ticker as ticker
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-import seaborn
+import seaborn as sns
 # warnings.filterwarnings('ignore', category=UserWarning) # ignore warnings
 startTime = datetime.now() # time the code
 
@@ -65,14 +65,16 @@ def proj_RA_DEC(RA, DEC, pm_ra, pm_dec, prlx, epoch, JD, D0_NS, D0_EW,date1):
 	# Add together
 	delta_RA = prop_RA + par_RA
 	delta_DEC = prop_DEC + par_DEC
+
 	# get starting positions in RA and DEC
 	date1_jd = Time(date1,format = 'decimalyear').jd
-
 	RA_start, DEC_start = get_initial_RA_DEC(RA, DEC, pm_ra,pm_dec,prlx,date1,date1_jd)
 
 	# Subtract starting position
-	delta_RA =  rad2mas(delta_RA  - RA_start)
-	delta_DEC = rad2mas(delta_DEC - DEC_start)
+
+	delta_RA =  rad2mas(delta_RA- RA_start)
+	delta_DEC = rad2mas(delta_DEC- DEC_start)
+
 
 	# Convert RA and DEC to NS,EW
 	delta_EW= -delta_RA*np.cos(prop_DEC)  # EW motion of a background object relative to star (mas)
@@ -81,6 +83,9 @@ def proj_RA_DEC(RA, DEC, pm_ra, pm_dec, prlx, epoch, JD, D0_NS, D0_EW,date1):
 	# Start from initial NS,EW offset (start from the first data point)
 	NS_vector = D0_NS + delta_NS
 	EW_vector = D0_EW + delta_EW
+
+
+
 	return NS_vector,EW_vector
 
 
@@ -127,10 +132,11 @@ def parallax_offset(prlx, prop_RA,prop_DEC,JD):
 
 	'''
 	x,y,z = earthPos(JD) # get earth geocenter ephemerides using jplephem package
+
 	par_RA  = prlx * 1./np.cos(prop_DEC) *(x*np.sin(prop_RA) - y*np.cos(prop_RA))
 	par_DEC = prlx*(x*np.cos(prop_RA)*np.sin(prop_DEC) + y*np.sin(prop_RA)*np.sin(prop_DEC) - z* np.cos(prop_RA))
 	par_RA = mas2rad(par_RA)
-	par_DEC = mas2rad(par_DEC)	
+	par_DEC = mas2rad(par_DEC)
 	return par_RA,par_DEC
 
 def get_initial_RA_DEC(RA, DEC, pm_ra,pm_dec,prlx,epoch,JD):
@@ -207,7 +213,6 @@ ICRS   = np.loadtxt(params, delimiter=',', dtype=np.str,usecols=[1,2])
 values = np.loadtxt(params, delimiter=',', dtype=np.float,usecols=[3,4,5,6,7,8])
 data   = np.loadtxt(data_name, delimiter=',', dtype=np.float)
 
-
 # Find target row in params text file
 if triple == True:
 	a = np.where(np.char.find(labels, target[:-3]) > -1) # string comparison
@@ -220,28 +225,32 @@ ind = a[0][0]                  # save index and strip extra array things. not th
 RA_J2000, DEC_J2000 = convert_coords(ICRS[ind,:]) # convert coordinates to radians
 values = mas2rad(values)   # convert everything else to radians now
  
-# Assign SIMBAD parameters individual names	
-prlx    = rad2mas(values[ind][0])   # mas
-dprlx   = rad2mas(values[ind][1])   # mas
-pm_ra   = values[ind][2]   # rad/yr
-dpm_ra  = values[ind][3]   # rad/yr
-pm_dec  = values[ind][4]   # rad/yr
-dpm_dec = values[ind][5]   # rad/yr
 
+
+# Assign SIMBAD parameters individual names	
+prlx    = values[ind][0]   # mas
+prlx = 2.99
+dprlx   = 0.42   # mas
+pm_ra   = mas2rad(-18.041 )   # mas/yr
+dpm_ra  = mas2rad(2.381)   # mas/yr
+pm_dec  = mas2rad(8.074)   # mas/yr
+dpm_dec = mas2rad(0.944)   # mas/yr
+# print(prlx)
+# 1/0
 # Assign measured astrometry parameters individual names 
-D0_NS   = data[0][3]  # NS initial positions  - mas
-D0_EW   = data[0][1]  # EW initial positions  - mas
-JD      = data[:,0]   # full JD
-NS      = data[:,3]   # NS data
-EW      = data[:,1]   # EW data
-dEW     = data[:,2]   # EW error
-dNS     = data[:,4]   # NS error
+D0_NS   = 2.8 # NS initial positions  - mas
+D0_EW   = 3858  # EW initial positions  - mas
+JD      = [2456135.50,2456443.50]   # full JD
+NS      = [2.8,-1.3] # NS data
+EW      = [3858,3859.3]   # EW data
+dEW     = [1.8, 1.8]   # EW error
+dNS     = [1.7,1.7]   # NS error
 
 
 # Convert JD into decimal year
 t = Time(JD,format = 'jd').decimalyear
-tl = np.linspace(np.floor(np.min(t))+0.6, np.ceil(np.max(t))+2, npoints)
-# tl = np.linspace(np.floor(np.min(t)), 2020, npoints)
+tl = np.linspace(np.floor(np.min(t)), np.ceil(np.max(t)+2), npoints)
+# tl = np.linspace(2012, 2015, npoints)
 
 # tl = np.linspace(np.min(t)-0.15, np.max(t)+0.15, npoints)
 # tl = np.linspace(np.min(t), np.max(t), npoints)
@@ -252,27 +261,17 @@ JDL = Time(tl,format = 'decimalyear').jd
 
 NS_vector,EW_vector = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, prlx, tl, JDL, D0_NS, D0_EW,t[0])
 
-pl.figure
-pl.plot(NS_vector)
-pl.show()
-
-pl.figure
-pl.plot(EW_vector)
-pl.show()
-
-SEP = np.sqrt(EW_vector**2+NS_vector**2)
+# SEP = np.sqrt(EW_vector**2+NS_vector**2)
 
 # SEPA=np.sqrt(EWtrackarray**2 + NStrackarray**2) 
 
 
-pl.figure
-a = np.sqrt(NS**2.+EW**2.)
-# pl.plot(SEPA.T,color="black", lw=1, alpha=0.1)
-pl.plot(tl,SEP,color="blue", lw=1, alpha=1)
-pl.plot(t,a,'ok')
-pl.savefig(target +'/'+ target + 'test_plot_NSEW.pdf')
-pl.show()
-1/0
+
+
+# # pl.plot(SEPA.T,color="black", lw=1, alpha=0.1)
+# pl.plot(tl,SEP,color="blue", lw=1, alpha=1)
+# pl.savefig(target +'/'+ target + 'test_plot_NSEW.pdf')
+
 
 # NS2_vector,EW2_vector = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, prlx, tl2, JDL2, D0_NS, D0_EW,t[0])
 
@@ -299,8 +298,8 @@ pl.show()
 
 
 # Computing the errors - draw samples from a normal distribution for each uncertain value
-Nstart_track = np.random.normal(D0_NS , scale = np.min(dNS), size = ntracks)
-Estart_track = np.random.normal(D0_EW , scale = np.min(dEW), size = ntracks)
+Nstart_track = np.random.normal(D0_NS , scale = dNS[0], size = ntracks)
+Estart_track = np.random.normal(D0_EW , scale = dEW[0], size = ntracks)
 prlx_track   = np.random.normal(prlx  , scale = dprlx      , size = ntracks)
 pm_dec_track = np.random.normal(pm_dec, scale = dpm_dec    , size = ntracks)
 pm_ra_track  = np.random.normal(pm_ra , scale = dpm_ra     , size = ntracks)
@@ -311,24 +310,31 @@ NStrackarray = np.zeros([ntracks, npoints])
 
 # fill array
 for i in range(0,ntracks):
-	# NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx,\
-	# tl, JDL,Nstart_track[i], Estart_track[i],t[0])
-	NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, 0,\
+	NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx,\
 	tl, JDL,Nstart_track[i], Estart_track[i],t[0])
+	# NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, prlx,\
+	# tl, JDL,Nstart_track[i], Estart_track[i],t[0])
 
 
 	EWtrackarray[i,:]=EW_track
 	NStrackarray[i,:]=NS_track
 
 # Now the percentile calculation 
-sigma_ew = np.asarray(map(lambda v: (v[1]-v[0]),zip(*np.percentile(EWtrackarray, [50, 68], axis=0))))
-sigma_ns = np.asarray(map(lambda v: (v[1]-v[0]),zip(*np.percentile(NStrackarray, [50, 68], axis=0))))
-
-print(np.shape(EWtrackarray))
+sigma_ew = 2*np.asarray(map(lambda v: (v[1]-v[0]),zip(*np.percentile(EWtrackarray, [50, 68], axis=0))))
+sigma_ns = 2*np.asarray(map(lambda v: (v[1]-v[0]),zip(*np.percentile(NStrackarray, [50, 68], axis=0))))
 
 
+# SEP = np.sqrt(EW_vector**2+NS_vector**2)
+# sig = np.sqrt(sigma_ew**2+sigma_ns**2)
+# SEParray = np.sqrt(EWtrackarray**2+NStrackarray**2).T
 
+# pl.figure
+# pl.plot(tl,SEP,'-k')
+# pl.plot(tl,SEP+sig)
+# pl.plot(tl,SEP-sig)
 
+# pl.show()
+# 1/0
 
 '''
 Plotting
@@ -339,6 +345,8 @@ csfont = {'fontname':'Gill Sans MT'}
 majorLocator   = MultipleLocator(1)
 majorFormatter = FormatStrFormatter('%d')
 minorLocatorx   = MultipleLocator(0.1)
+# sns.set_style("darkgrid")
+
 # minorLocatory  =  MultipleLocator(1)
 minorLocator1   = AutoMinorLocator(n=2)
 
@@ -396,14 +404,15 @@ for axis in ['top','bottom','left','right']:
 pl.xlim([np.min(tl),np.max(tl)])
 fig.tight_layout()
 fig.subplots_adjust(hspace=0.001) # no horizontal space between figures
-pl.savefig(target +'/'+ target + '_plot_NSEW.pdf')
+pl.show()
+# pl.savefig(target +'/'+ target + '_plot_NSEW.pdf')
 
 
 
 # pl.figure()
-# pl.plot(tl,np.sqrt(EW_vector**2+NS_vector**2))
-# pl.savefig('separation.png')
-
+# sns.plot(tl,np.sqrt(EW_vector**2+NS_vector**2))
+# # pl.savefig('separation.png')
+# pl.show()
 
 
 
