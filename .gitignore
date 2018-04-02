@@ -2,3 +2,4 @@
 *.bsp
 de430.bsp
 .DS_Store
+*.txt
