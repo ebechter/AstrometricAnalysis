@@ -10,7 +10,7 @@ to generate the simulated paths. Use percentile to take 68 and 95 positions on e
 '''
 from __future__ import print_function
 import matplotlib
-# matplotlib.use('agg')
+matplotlib.use('agg')
 import csv
 import jplephem
 import de421
@@ -29,7 +29,9 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 # import seaborn as sns
-warnings.filterwarnings('ignore', category=UserWarning) # ignore warnings
+warnings.filterwarnings('ignore', category=FutureWarning) # ignore warnings
+# warnings.filterwarnings('ignore', category=FutureWarning) # ignore warnings
+
 startTime = datetime.now() # time the code
 
 def convert_coords(array):
@@ -198,14 +200,14 @@ def Sec(theta):
 
 ## INPUTS: 
 
-target    = 'HD31018AB'
+target    = 'HD1384AB'
 params    = 'CompendiumStars.txt'
 # params    = 'CompendiumStars.txt'
 
 data_name = target + '/' + target+'.txt'
 npoints   =1000            # number of points that makes up the "tornado path"
 ntracks   =1000			# How many tracks used to calculate sigma from monte carlo
-triple = True 
+# triple = True 
 
 ## Read in Data
 labels = np.loadtxt(params, delimiter=',', dtype=np.str, usecols=[0])
@@ -214,12 +216,18 @@ values = np.loadtxt(params, delimiter=',', dtype=np.float,usecols=[3,4,5,6,7,8])
 data   = np.loadtxt(data_name, delimiter=',', dtype=np.float)
 
 # Find target row in params text file
-if triple == True:
-	a = np.where(np.char.find(labels, target[:-3]) > -1) # string comparison
-else:
-	a = np.where(np.char.find(labels, target) > -1) # string comparison
+# if triple == True:
+a = np.where(np.char.find(labels, target[:-2]) > -1) # string comparison
+# else:
+# a = np.where(np.char.find(labels, target) > -1) # string comparison
+
 
 ind = a[0][0]                  # save index and strip extra array things. not the cleanest..
+
+# double check targets match
+assert target[:-2] == labels[ind] ,'target star isnt listed in compendium'
+
+
 # Convert input params into radians 
 
 RA_J2000, DEC_J2000 = convert_coords(ICRS[ind,:]) # convert coordinates to radians
@@ -331,10 +339,10 @@ NStrackarray = np.zeros([ntracks, npoints])
 
 # fill array
 for i in range(0,ntracks):
+	# NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx_track[i],\
+	# tl, JDL,Nstart_track[i], Estart_track[i],t[0])
 	NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx_track[i],\
 	tl, JDL,Nstart_track[i], Estart_track[i],t[0])
-	# NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, prlx,\
-	# tl, JDL,Nstart_track[i], Estart_track[i],t[0])
 
 
 	EWtrackarray[i,:]=EW_track
