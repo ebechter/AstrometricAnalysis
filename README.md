@@ -8,7 +8,7 @@ The primary star's parallactic motion is calculated using its celestial coordina
 
 This code is written in Python 2, and therefore first requires a copy of that in order to run.
 
-### Package and file dependencies 
+### Package dependencies 
 
 The following Python packages must be installed: 
 1. numpy 
@@ -18,6 +18,7 @@ The following Python packages must be installed:
 5. jplephem
 6. de421
 
+### File dependencies 
 The following files must also be located in the main running directory: 
 1. de430.bsp 
 Note: The JPL planetary ephemerides are saved as files of Chebyshev polynomials fit to the Cartesian positions and velocities of the planets, Sun, and Moon, typically in 32-day intervals. DE430 covers 1549-12-21 to 2650-01-25. Referred to the ICRF version 2.0.
