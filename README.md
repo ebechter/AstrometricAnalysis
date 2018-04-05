@@ -6,15 +6,31 @@ The primary star's parallactic motion is calculated using its celestial coordina
 
 ## Getting Started
 
+This code is written in Python 2, and therefore first requires a copy of that in order to run.
 
-### Dependencies 
+### Package and file dependencies 
 
-There are a lot of extraneous files needed to run this code.
+The following Python packages must be installed: 
+1. numpy 
+2. matplotlib
+3. csv
+4. astropy
+5. jplephem
+6. de421
 
-
-
-
-### Example Simulation
+The following files must also be located in the main running directory: 
+1. de430.bsp 
+Note: The JPL planetary ephemerides are saved as files of Chebyshev polynomials fit to the Cartesian positions and velocities of the planets, Sun, and Moon, typically in 32-day intervals. DE430 covers 1549-12-21 to 2650-01-25. Referred to the ICRF version 2.0.
+2. starlist.txt - example named CompendiumStars.txt
+Note: This is a file of all target stars used in the analysis. It is used as a look up table for SIMBAD values. The file is formatted in the following way (with a few examples): 
+```
+Name,RA,DEC,PRLX(mas),dPRLX(mas),PM_RA(mas/yr),dPM_RA(mas/yr),PM_DEC(mas/yr),dPM_DEC(mas/yr)
+HAT-P-7,19h28m59.3616s,+47d58m10.26s,+03.12, 0.44,-14.8,1.5,8.7,1.4
+HAT-P-33,07h32m44.218s,+33d50m06.12s,+02.58, 0.06,-2.2,-4.9, 1.3, 1.0
+HD129814,14h44m11.69s,+18d27m43.56s,24.32, 0.60,-70.88, 0.54,-151.63, 0.6 
+HD142229,15h53m20.01s,+04d15m11.50s,24.52, 1.25,-23.19, 1.08,+8.48, 1.24 
+```
+### Example run
 
 A step by step series of examples that tell you have to get a development env running
 
@@ -34,9 +50,7 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+**Eric Bechter** 
 
 ## License
 
@@ -44,6 +58,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* This code was originally developed for the TRENDS program, PI Justin Crepp , University of Notre Dame.  
+* I would like to acknowledge Henry Ngo for his very helpful explanations on getting started and specifically calculating the projected parallactic motion and integrating the ephemerides into Python. 
