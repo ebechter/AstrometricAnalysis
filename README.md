@@ -1,15 +1,8 @@
 # Astrometric Analysis code
 
-This code calculates the astrometric motion of star over a specified time frame using JPL Horizons ephermerides and SIMBAD proper motion and parallax measurements. A directly imaged candidate companion can be determined to be gravitationally bound or an unbound foreground star using this analysis.   
+This code calculates the astrometric motion of star over a specified time frame using JPL Horizons ephermerides and SIMBAD proper motion and parallax measurements. A directly imaged candidate companion can be determined to be gravitationally bound or an unbound background source in the same line of sight by assessing whether or not the candidate shares common proper motion with the primary star. A background star will remain effectively staionary while the primary star moves across the sky with its known proper motion and parallax. Therefore, it is possible to project the relative, time-varying, relative separation that we expect between the primary and background star, called the "background track" (i.e. the evolution of the companion’s separation as a function of time if it was a background object).        
 
-First, multiple relative astrometric values are computed from direct images of the target and companion(s). Then, we propagate the expected motion of the primary star, in time, according to its known proper motion velocity and parallax measurments. This astrometric path, split into $\delta$ East and \Delta North motion, is plotted with 1 and 2 sigma uncertainty regions shaded against the measured relative position of the companion. If the  
-
-
-Monte Carlo error propagation:
-Sample proper motion, parallax, and initial position (in North and East) from a gaussian 
-to generate the simulated paths. Use percentile to take 68 and 95 positions on each timestep. 
-
-
+The primary star's parallactic motion is calculated using its celestial coordinates from SIMBAD and the Earth ephemerides from JPL Horizons. The proper motion is also calculated from SIMBAD. The background track uncertanties are computed using Monte Carlo error propagation that takes into account uncertanties in the primary star’s celestial coordinates, proper motion, and parallax in addition to our measurement uncertainties in astrometric separation.
 
 ## Getting Started
 
