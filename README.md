@@ -1,4 +1,4 @@
-# Astrometric Analysis code
+# Astrometric Analysis 
 
 This code calculates the astrometric motion of star over a specified time frame using JPL Horizons ephermerides and SIMBAD proper motion and parallax measurements. A directly imaged candidate companion can be determined to be gravitationally bound or an unbound background source in the same line of sight by assessing whether or not the candidate shares common proper motion with the primary star. A background star will remain effectively staionary while the primary star moves across the sky with its known proper motion and parallax. Therefore, it is possible to project the relative, time-varying, relative separation that we expect between the primary and background star, called the "background track" (i.e. the evolution of the companion’s separation as a function of time if it was a background object).        
 
@@ -31,23 +31,29 @@ HAT-P-33,07h32m44.218s,+33d50m06.12s,+02.58, 0.06,-2.2,-4.9, 1.3, 1.0
 HD129814,14h44m11.69s,+18d27m43.56s,24.32, 0.60,-70.88, 0.54,-151.63, 0.6 
 HD142229,15h53m20.01s,+04d15m11.50s,24.52, 1.25,-23.19, 1.08,+8.48, 1.24 
 ```
+3. A folder with the same name as the star that contains the astrometric measurements in the format:
+```
+Julian Date, NS(mas),dNS(mas),EW(mas),dEW(mas)
+2455803.8,-453.055,0.687,-110.458,0.714
+2456522.9,-454.782,0.075,-111.798,0.201
+2457213.3,-456.027,0.168,-77.298,0.811
+```
+
 ### Example run
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+Set target star and starlist: 
 
 ```
-Give the example
+target = 'HD224983AB'
+params = 'CompendiumStars.txt'
 ```
 
-And repeat
-
+Then set the number of points to compute the background track at and the number of tracks for Monte Carlo error propagation:
 ```
-until finished
+npoints = 1000            
+ntracks = 1000
 ```
-
-End with an example of getting some data out of the system or using it for a little demo
+The program will automatically search for your target in the paramater file and plot the background track against the measured relative astrometry. 
 
 ## Authors
 
