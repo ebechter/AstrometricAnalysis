@@ -55,7 +55,7 @@ ntracks = 1000
 ```
 The program will automatically search for your target in the paramater file and plot the background track against the measured relative astrometry. 
 
-![TestImage](/TRENDSVII/Figures/HD224983AB_dNdE.pdf)
+![](example.png)
 
 ## Authors
 
