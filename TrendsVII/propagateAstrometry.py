@@ -200,7 +200,7 @@ def Sec(theta):
 
 ## INPUTS: 
 
-target    = 'HD1384AB'
+target    = 'HD224983AB'
 params    = 'CompendiumStars.txt'
 # params    = 'CompendiumStars.txt'
 
@@ -211,27 +211,23 @@ ntracks   =1000			# How many tracks used to calculate sigma from monte carlo
 
 ## Read in Data
 labels = np.loadtxt(params, delimiter=',', dtype=np.str, usecols=[0])
-ICRS   = np.loadtxt(params, delimiter=',', dtype=np.str,usecols=[1,2])
-values = np.loadtxt(params, delimiter=',', dtype=np.float,usecols=[3,4,5,6,7,8])
+ICRS   = np.loadtxt(params, delimiter=',', dtype=np.str,usecols=[1,2,3,4])
+values = np.loadtxt(params, delimiter=',', dtype=np.float,usecols=[5,6,7,8,9,10])
 data   = np.loadtxt(data_name, delimiter=',', dtype=np.float)
-
 # Find target row in params text file
 # if triple == True:
 a = np.where(np.char.find(labels, target[:-2]) > -1) # string comparison
 # else:
 # a = np.where(np.char.find(labels, target) > -1) # string comparison
 
-
 ind = a[0][0]                  # save index and strip extra array things. not the cleanest..
-
 # double check targets match
 assert target[:-2] == labels[ind] ,'target star isnt listed in compendium'
 
 
 # Convert input params into radians 
-
-RA_J2000, DEC_J2000 = convert_coords(ICRS[ind,:]) # convert coordinates to radians
-
+RA_J2000, DEC_J2000 = convert_coords(ICRS[ind,0:2]) # convert coordinates to radians
+dRA, dDEC = convert_coords(ICRS[ind,2:4]) # convert coordinates to radians
 
 values = mas2rad(values)   # convert everything else to radians now
  
@@ -327,6 +323,8 @@ NS_vector,EW_vector = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra, pm_dec, prlx, tl, 
 
 
 # Computing the errors - draw samples from a normal distribution for each uncertain value
+RA_track = np.random.normal(RA_J2000 , scale = dRA, size = ntracks)
+DEC_track = np.random.normal(DEC_J2000 , scale = dDEC, size = ntracks)
 Nstart_track = np.random.normal(D0_NS , scale = dNS[0], size = ntracks)
 Estart_track = np.random.normal(D0_EW , scale = dEW[0], size = ntracks)
 prlx_track   = np.random.normal(prlx  , scale = dprlx      , size = ntracks)
@@ -341,7 +339,7 @@ NStrackarray = np.zeros([ntracks, npoints])
 for i in range(0,ntracks):
 	# NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx_track[i],\
 	# tl, JDL,Nstart_track[i], Estart_track[i],t[0])
-	NS_track,EW_track = proj_RA_DEC(RA_J2000, DEC_J2000, pm_ra_track[i], pm_dec_track[i], prlx_track[i],\
+	NS_track,EW_track = proj_RA_DEC(RA_track[i], DEC_track[i], pm_ra_track[i], pm_dec_track[i], prlx_track[i],\
 	tl, JDL,Nstart_track[i], Estart_track[i],t[0])
 
 
@@ -432,8 +430,8 @@ for axis in ['top','bottom','left','right']:
 pl.xlim([np.min(tl),np.max(tl)])
 fig.tight_layout()
 fig.subplots_adjust(hspace=0.001) # no horizontal space between figures
-pl.savefig(target +'/'+ target + '_dNdE.pdf')
-pl.savefig('Figures' +'/'+ target + '_dNdE.pdf')
+pl.savefig(target +'/'+ target + '_dNdE2.pdf')
+# pl.savefig('Figures' +'/'+ target + '_dNdE.pdf')
 
 
 
